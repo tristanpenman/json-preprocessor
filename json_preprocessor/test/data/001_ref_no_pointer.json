@@ -1,0 +1,5 @@
+{
+    "hello": {
+        "$ref": "rel://data/001_ref_no_pointer_chunk.json"
+    }
+}

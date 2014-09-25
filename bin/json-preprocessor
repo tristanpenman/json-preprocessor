@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+import click
+import json
+
+from json_preprocessor import resolve
+
+parameter_help_text = 'A key-value pair to be passed to the resolver; ' \
+                      'this option may be used more than once to pass in ' \
+                      'multiple key-value pairs.'
+
+output_help_text = 'Path that the resolved document should be written to.'
+
+resolve_help_text = 'This command will attempt to resolve and execute any ' \
+                    'of the supported pre-processor directives down to a ' \
+                    'specified depth.'
+
+
+@click.group(no_args_is_help=True,
+             invoke_without_command=True,
+             short_help=resolve_help_text)
+@click.option('--parameter', metavar='<key=value>',
+              help=parameter_help_text,
+              type=str, nargs=-1)
+@click.option('--output-file', metavar='<path>',
+              help=output_help_text,
+              type=click.Path(writable=True), default=None)
+@click.argument('path-to-document', metavar='<path-to-document>',
+                type=click.Path(exists=True))
+def cli(parameter, output_file, path_to_document):
+    """Resolve a JSON document containing JSON References or other
+       pre-processor directives. \n
+       Supported pre-processor directives: $ref, $join, $merge and $exec
+    """
+    with open(path_to_document) as data:
+        param_dict = dict(param.split('=') for param in parameter)
+        resolved = json.dumps(resolve(json.load(data), param_dict), indent=4)
+        if output_file is None:
+            print(resolved)
+        else:
+            with open(output_file, 'w') as f:
+                f.write(resolved)
+                f.close()
+
+
+if __name__ == '__main__':
+    cli()
