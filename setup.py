@@ -7,5 +7,5 @@ setup(
     description='JSON Preprocessor library and command line utility that can '
                 'be used to resolve JSON References and other pre-processor '
                 'directives.',
-    requires=['click']
+    requires=['boto', 'click']
 )
