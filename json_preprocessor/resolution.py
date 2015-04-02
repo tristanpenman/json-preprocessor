@@ -1,6 +1,6 @@
 #!/usr/bin/env python
-import commands
 import json
+import subprocess
 import urlparse
 
 from urllib2 import urlopen
@@ -9,7 +9,9 @@ from urllib2 import urlopen
 def resolve_exec(node, base_resolver_fn):
     """ Resolve an $exec pre-processor directive.
     """
-    return commands.getoutput(base_resolver_fn(node, base_resolver_fn))
+    process_output = subprocess.check_output(
+        base_resolver_fn(node, base_resolver_fn), shell=True)
+    return unicode(process_output).rstrip('\n')
 
 
 def resolve_join(node, base_resolver_fn):
