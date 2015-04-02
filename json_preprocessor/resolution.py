@@ -1,9 +1,16 @@
 #!/usr/bin/env python
 import json
 import subprocess
-import urlparse
 
-from urllib2 import urlopen
+try:
+    from urlparse import urldefrag, urlsplit
+except ImportError:
+    from urllib.parse import urldefrag, urlsplit
+
+try:
+    from urllib2 import urlopen
+except ImportError:
+    from urllib.request import urlopen
 
 
 def resolve_exec(node, base_resolver_fn):
@@ -11,7 +18,10 @@ def resolve_exec(node, base_resolver_fn):
     """
     process_output = subprocess.check_output(
         base_resolver_fn(node, base_resolver_fn), shell=True)
-    return unicode(process_output).rstrip('\n')
+    try:
+        return unicode(process_output).rstrip('\n')
+    except NameError as e:
+        return process_output.decode("utf-8").rstrip('\n')
 
 
 def resolve_join(node, base_resolver_fn):
@@ -93,18 +103,22 @@ def resolve_merge(node, base_resolver_fn):
     for value in values:
         if not isinstance(value, dict):
             raise Exception("merge operand must be an object")
-        result = dict(result.items() + value.items())
+        result.update(value)
 
     return dict(result)
 
 
 def resolve_ref(node, base_resolver_fn, uri_handlers):
     ref = base_resolver_fn(node, base_resolver_fn)
-    base_uri, frag = urlparse.urldefrag(ref)
-    base_uri_parts = urlparse.urlsplit(base_uri)
+    base_uri, frag = urldefrag(ref)
+    base_uri_parts = urlsplit(base_uri)
 
     # Check for a custom URI handler that supports the current scheme
-    for key, handler_fn in uri_handlers.iteritems():
+    try:
+        items = uri_handlers.iteritems()
+    except AttributeError:
+        items = uri_handlers.items()
+    for key, handler_fn in items:
         if base_uri_parts.scheme == key:
             return base_resolver_fn(handler_fn(ref), base_resolver_fn)
 
@@ -116,24 +130,24 @@ def resolve_ref(node, base_resolver_fn, uri_handlers):
 def resolve_node(node, doc_args, custom_uri_handlers):
 
     def resolve_uri_arg(uri):
-        base_uri, frag = urlparse.urldefrag(uri)
-        base_uri_parts = urlparse.urlsplit(base_uri)
+        base_uri, frag = urldefrag(uri)
+        base_uri_parts = urlsplit(base_uri)
         if base_uri_parts.netloc not in doc_args:
             raise Exception("Argument '" + base_uri_parts.netloc + "' not set.")
         return doc_args[base_uri_parts.netloc]
 
     def resolve_uri_rel(uri):
-        base_uri, frag = urlparse.urldefrag(uri)
-        base_uri_parts = urlparse.urlsplit(base_uri)
+        base_uri, frag = urldefrag(uri)
+        base_uri_parts = urlsplit(base_uri)
         with open(base_uri_parts.netloc + base_uri_parts.path) as data:
             if base_uri_parts.query:
                 query_args = dict(arg.split("=")
                                   for arg in base_uri_parts.query.split("&"))
             else:
                 query_args = dict()
-            return resolve_node(json.load(data),
-                                dict(doc_args.items() + query_args.items()),
-                                custom_uri_handlers)
+            new_dict = doc_args.copy()
+            new_dict.update(query_args)
+            return resolve_node(json.load(data), new_dict, custom_uri_handlers)
 
     default_uri_handlers = {
         'arg': resolve_uri_arg,
@@ -141,9 +155,9 @@ def resolve_node(node, doc_args, custom_uri_handlers):
     }
 
     def resolve_ref_with_uri_handlers(inner_node, inner_base_resolver_fn):
-        return resolve_ref(inner_node, inner_base_resolver_fn,
-                           dict(default_uri_handlers.items() +
-                                custom_uri_handlers.items()))
+        new_dict = default_uri_handlers.copy()
+        new_dict.update(custom_uri_handlers)
+        return resolve_ref(inner_node, inner_base_resolver_fn, new_dict)
 
     resolvers = {
         '$ref': resolve_ref_with_uri_handlers,
@@ -162,7 +176,11 @@ def resolve_node(node, doc_args, custom_uri_handlers):
 
     elif isinstance(node, dict):
         # Check for a matching custom resolver for an object
-        for key, custom_resolver_fn in resolvers.iteritems():
+        try:
+            items = resolvers.iteritems()
+        except AttributeError:
+            items = resolvers.items()
+        for key, custom_resolver_fn in items:
             if key in node:
                 return custom_resolver_fn(node[key], base_resolver_fn)
 
