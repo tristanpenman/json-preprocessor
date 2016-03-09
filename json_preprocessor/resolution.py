@@ -17,7 +17,7 @@ def resolve_exec(node, base_resolver_fn):
     """ Resolve an $exec pre-processor directive.
     """
     process_output = subprocess.check_output(
-        base_resolver_fn(node, base_resolver_fn), shell=True)
+        base_resolver_fn(node, base_resolver_fn), shell=False)
     try:
         return unicode(process_output).rstrip('\n')
     except NameError as e:
