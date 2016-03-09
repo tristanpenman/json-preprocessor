@@ -143,7 +143,7 @@ parameter_help_text = 'A key-value pair to be passed to the template; ' \
               type=str, default=None)
 @click.option('--parameter', metavar='<key=value>',
               help=parameter_help_text,
-              type=str, nargs=-1)
+              type=str, multiple=True)
 @click.argument('path-to-document', metavar='<path-to-document>',
                 type=click.Path(exists=True))
 def cli(minify, output_file, parameter, path_to_document):
