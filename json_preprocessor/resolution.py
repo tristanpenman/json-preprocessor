@@ -16,8 +16,15 @@ except ImportError:
 def resolve_exec(node, base_resolver_fn):
     """ Resolve an $exec pre-processor directive.
     """
-    process_output = subprocess.check_output(
-        base_resolver_fn(node, base_resolver_fn), shell=False)
+    if not isinstance(node, list):
+        raise Exception("$exec value must be an array")
+    elif len(node) < 1:
+        raise Exception("$exec array must contain at least one element")
+
+    # Resolve each object in the array
+    args = [base_resolver_fn(value, base_resolver_fn) for value in node]
+
+    process_output = subprocess.check_output(args, shell=False)
     try:
         return unicode(process_output).rstrip('\n')
     except NameError as e:

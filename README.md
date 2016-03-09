@@ -26,21 +26,26 @@ Directives
 An $exec directive allows the output of an external command to be used as a
 value in a JSON document.
 
-Example:
+The command to be executed is provided as an array. The first element should
+be the path to an executable, with the remaining elements containing program
+arguments.
+
+For example, the following JSON snippet:
 
     {
         "timestamp": {
-            "$exec": "date"
+            "$exec": [ "/bin/date" ]
         }
     }
 
-Produces:
+would produce output similar to:
 
     {
         "timestamp": "Thu 25 Sep 2014 15:30:40 AEST"
     }
 
-Note that an $exec directive is *not* executed in a shell.
+Note that an $exec directive is *not* executed in a shell, which means that
+functionality such as pipes and shell built-ins are not available.
 
 ###$join###
 

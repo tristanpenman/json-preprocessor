@@ -1,5 +1,5 @@
 [
     {
-        "$exec": "echo 'test'"
+        "$exec": [ "/bin/echo", "test" ]
     }
 ]
