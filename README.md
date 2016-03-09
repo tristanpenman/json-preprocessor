@@ -16,6 +16,8 @@ The following pre-processor directives are supported:
 
 *Note that JSON Reference support is not yet complete.*
 
+This project has been tested against Python 2.7 and 3.5.
+
 Directives
 ----------
 
@@ -37,6 +39,8 @@ Produces:
     {
         "timestamp": "Thu 25 Sep 2014 15:30:40 AEST"
     }
+
+Note that an $exec directive is *not* executed in a shell.
 
 ###$join###
 
