@@ -106,16 +106,18 @@ The JSON Preprocessor library supports the following URIs:
 * ```file://``` (for absolute file references)
 * ```rel://``` (for relative file references)
 
-
 JSON Preprocessor Utility
 -------------------------
 
 This project includes a JSON Preprocessor command line utility that serves as
-an example of how to use the JSON Preprocessor library.
+an example of how to use the JSON Preprocessor library. It extends the $ref
+directive to retrieve attributes associated with CloudFormation resources,
+which can be useful when constructing CloudFormation templates as part of an
+automated build process.
 
-###CFN Support###
+###CFN References###
 
-This example registers a custom ```$ref``` URI to add support for
+This example registers a custom ```$ref``` URI type that adds support for
 CloudFormation resources via the [boto](https://github.com/boto/boto) library.
 
 CloudFormation resources are identified using a specific URI format:
@@ -150,3 +152,31 @@ will be returned.
                                option may be used more than once to pass in
                                multiple key-value pairs.
       --help                   Show this message and exit.
+
+Installation
+------------
+
+Both the library and an example command line utility can be installed using pip:
+
+    pip install -r requirements
+    pip install .
+
+You can check that the installation was successful by running the command line
+utility with no arguments:
+
+    json-preprocessor
+
+If the installation was successful, usage instructions for `json-preprocessor`
+will be displayed.
+
+License
+-------
+
+This code is licensed under the 3-clause BSD License.
+
+See the LICENSE file for more information.
+
+Acknowledgements
+----------------
+
+Shout-out to [elruwen](https://github.com/elruwen) for early code reviews.
