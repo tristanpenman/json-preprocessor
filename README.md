@@ -1,8 +1,6 @@
-JSON Preprocessor Tool
-======================
+# JSON Preprocessor [![Build Status](https://travis-ci.org/tristanpenman/json-preprocessor.svg)](https://travis-ci.org/tristanpenman/json-preprocessor) #
 
-Overview
---------
+## Overview ##
 
 This project provides a JSON Preprocessor library and command line utility that
 can be used to resolve JSON References and other pre-processor directives.
@@ -18,8 +16,7 @@ The following pre-processor directives are supported:
 
 This project has been tested against Python 2.7 and 3.5.
 
-Directives
-----------
+## Directives ##
 
 ###$exec###
 
@@ -118,8 +115,7 @@ The JSON Preprocessor library supports the following URIs:
 * ```file://``` (for absolute file references)
 * ```rel://``` (for relative file references)
 
-JSON Preprocessor Utility
--------------------------
+## JSON Preprocessor Utility ##
 
 This project includes a JSON Preprocessor command line utility that serves as
 an example of how to use the JSON Preprocessor library. It extends the $ref
@@ -165,8 +161,7 @@ will be returned.
                                multiple key-value pairs.
       --help                   Show this message and exit.
 
-Installation
-------------
+## Installation ##
 
 Both the library and an example command line utility can be installed using pip:
 
@@ -181,14 +176,12 @@ utility with no arguments:
 If the installation was successful, usage instructions for `json-preprocessor`
 will be displayed.
 
-License
--------
+## License ##
 
 This code is licensed under the 3-clause BSD License.
 
 See the LICENSE file for more information.
 
-Acknowledgements
-----------------
+## Acknowledgements ##
 
 Shout-out to [elruwen](https://github.com/elruwen) for early code reviews.
