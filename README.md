@@ -66,6 +66,13 @@ following output:
 
     "A B C"
 
+This can be useful when constructing strings using the resolved values of
+other directives. For example:
+
+    {
+        "$join": [ " ", [ "Current time:", { "$exec": [ "/bin/date" ] } ] ]
+    }
+
 ###$merge###
 
 The value of a $merge directive must be an array of objects. These
