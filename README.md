@@ -1,9 +1,11 @@
-# JSON Preprocessor [![Build Status](https://travis-ci.org/tristanpenman/json-preprocessor.svg)](https://travis-ci.org/tristanpenman/json-preprocessor) #
+# JSON Preprocessor [![Build Status](https://travis-ci.org/tristanpenman/json-preprocessor.svg)](https://travis-ci.org/tristanpenman/json-preprocessor)
 
-## Overview ##
+## Overview
 
 This project provides a JSON Preprocessor library and command line utility that
-can be used to resolve JSON References and other pre-processor directives.
+can be used to resolve JSON References and other pre-processor directives. It
+was originally motivated by the need to construct CloudFormation templates as
+part of a CI pipeline.
 
 The following pre-processor directives are supported:
 
@@ -16,9 +18,9 @@ The following pre-processor directives are supported:
 
 This project has been tested against Python 2.7 and 3.5.
 
-## Directives ##
+## Directives
 
-###$exec###
+### $exec
 
 An $exec directive allows the output of an external command to be used as a
 value in a JSON document.
@@ -44,7 +46,7 @@ would produce output similar to:
 Note that an $exec directive is *not* executed in a shell, which means that
 functionality such as pipes and shell built-ins are not available.
 
-###$join###
+### $join
 
 The value of $join pre-processor directive must be an array containing
 two elements. The first element is a string that will be placed between
@@ -70,7 +72,7 @@ other directives. For example:
         "$join": [ " ", [ "Current time:", { "$exec": [ "/bin/date" ] } ] ]
     }
 
-###$merge###
+### $merge
 
 The value of a $merge directive must be an array of objects. These
 objects will be combined, with the attributes of later objects taking
@@ -103,7 +105,7 @@ Note that the value of 'my_attribute' defined by the first object in
 the array has been replaced by the value defined by the second object.
 
 
-###$ref###
+### $ref
 
 A $ref allows JSON References, and other remote resource references, to be
 resolved.
@@ -115,7 +117,7 @@ The JSON Preprocessor library supports the following URIs:
 * ```file://``` (for absolute file references)
 * ```rel://``` (for relative file references)
 
-## JSON Preprocessor Utility ##
+## JSON Preprocessor Utility
 
 This project includes a JSON Preprocessor command line utility that serves as
 an example of how to use the JSON Preprocessor library. It extends the $ref
@@ -123,7 +125,7 @@ directive to retrieve attributes associated with CloudFormation resources,
 which can be useful when constructing CloudFormation templates as part of an
 automated build process.
 
-###CFN References###
+### CFN References
 
 This example registers a custom ```$ref``` URI type that adds support for
 CloudFormation resources via the [boto](https://github.com/boto/boto) library.
@@ -145,7 +147,7 @@ recognised by boto, an exception may be raised.
 function. If ```[attribute]``` is omitted, the 'PhysicalResourceID' attribute
 will be returned.
 
-###Usage###
+### Usage
 
     Usage: json-preprocessor [OPTIONS] <path-to-document> COMMAND [ARGS]...
 
@@ -161,7 +163,7 @@ will be returned.
                                multiple key-value pairs.
       --help                   Show this message and exit.
 
-## Installation ##
+## Installation
 
 Both the library and an example command line utility can be installed using pip:
 
@@ -176,12 +178,12 @@ utility with no arguments:
 If the installation was successful, usage instructions for `json-preprocessor`
 will be displayed.
 
-## License ##
+## License
 
 This code is licensed under the 3-clause BSD License.
 
 See the LICENSE file for more information.
 
-## Acknowledgements ##
+## Acknowledgements
 
 Shout-out to [elruwen](https://github.com/elruwen) for early code reviews.
