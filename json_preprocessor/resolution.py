@@ -2,18 +2,14 @@
 import json
 import subprocess
 
-try:
-    from urlparse import urldefrag, urlsplit
-except ImportError:
-    from urllib.parse import urldefrag, urlsplit
+from typing import Union, Callable, Optional, Dict
+from urllib.parse import urldefrag, urlsplit
+from urllib.request import urlopen
 
-try:
-    from urllib2 import urlopen
-except ImportError:
-    from urllib.request import urlopen
+Node = Union[list, dict]
 
 
-def resolve_exec(node, base_resolver_fn):
+def resolve_exec(node: Node, base_resolver_fn: Callable) -> str:
     """ Resolve an $exec pre-processor directive.
     """
     if not isinstance(node, list):
@@ -25,13 +21,10 @@ def resolve_exec(node, base_resolver_fn):
     args = [base_resolver_fn(value, base_resolver_fn) for value in node]
 
     process_output = subprocess.check_output(args, shell=False)
-    try:
-        return unicode(process_output).rstrip('\n')
-    except NameError as e:
-        return process_output.decode("utf-8").rstrip('\n')
+    return process_output.decode("utf-8").rstrip('\n')
 
 
-def resolve_join(node, base_resolver_fn):
+def resolve_join(node: Node, base_resolver_fn: Callable) -> str:
     """ Resolve a $join pre-processor directive.
 
         The value of $join pre-processor directive must be an array containing
@@ -64,7 +57,7 @@ def resolve_join(node, base_resolver_fn):
                          for element in node[1]])
 
 
-def resolve_merge(node, base_resolver_fn):
+def resolve_merge(node: Node, base_resolver_fn: Callable) -> dict:
     """ Resolve a $merge pre-processor directive.
 
         The value of a $merge directive must be an array of objects. These
@@ -111,11 +104,10 @@ def resolve_merge(node, base_resolver_fn):
         if not isinstance(value, dict):
             raise Exception("merge operand must be an object")
         result.update(value)
-
     return dict(result)
 
 
-def resolve_ref(node, base_resolver_fn, uri_handlers):
+def resolve_ref(node: Node, base_resolver_fn: Callable, uri_handlers: Dict[str, Callable]):
     ref = base_resolver_fn(node, base_resolver_fn)
     base_uri, frag = urldefrag(ref)
     base_uri_parts = urlsplit(base_uri)
@@ -134,16 +126,16 @@ def resolve_ref(node, base_resolver_fn, uri_handlers):
                             base_resolver_fn)
 
 
-def resolve_node(node, doc_args, custom_uri_handlers):
+def resolve_node(node: Union[list, dict], doc_args: dict, custom_uri_handlers: dict) -> Node:
 
-    def resolve_uri_arg(uri):
+    def resolve_uri_arg(uri: str):
         base_uri, frag = urldefrag(uri)
         base_uri_parts = urlsplit(base_uri)
         if base_uri_parts.netloc not in doc_args:
             raise Exception("Argument '" + base_uri_parts.netloc + "' not set.")
         return doc_args[base_uri_parts.netloc]
 
-    def resolve_uri_rel(uri):
+    def resolve_uri_rel(uri: str):
         base_uri, frag = urldefrag(uri)
         base_uri_parts = urlsplit(base_uri)
         with open(base_uri_parts.netloc + base_uri_parts.path) as data:
@@ -161,7 +153,7 @@ def resolve_node(node, doc_args, custom_uri_handlers):
         'rel': resolve_uri_rel
     }
 
-    def resolve_ref_with_uri_handlers(inner_node, inner_base_resolver_fn):
+    def resolve_ref_with_uri_handlers(inner_node: str, inner_base_resolver_fn: Callable):
         new_dict = default_uri_handlers.copy()
         new_dict.update(custom_uri_handlers)
         return resolve_ref(inner_node, inner_base_resolver_fn, new_dict)
@@ -183,11 +175,7 @@ def resolve_node(node, doc_args, custom_uri_handlers):
 
     elif isinstance(node, dict):
         # Check for a matching custom resolver for an object
-        try:
-            items = resolvers.iteritems()
-        except AttributeError:
-            items = resolvers.items()
-        for key, custom_resolver_fn in items:
+        for key, custom_resolver_fn in resolvers.items():
             if key in node:
                 return custom_resolver_fn(node[key], base_resolver_fn)
 
@@ -198,7 +186,7 @@ def resolve_node(node, doc_args, custom_uri_handlers):
     return node
 
 
-def resolve(node, doc_args, custom_uri_handlers=None):
+def resolve(node: Node, doc_args: dict, custom_uri_handlers: Optional[dict] = None) -> Node:
     """Recursively resolve nodes in a JSON tree
     """
     if not custom_uri_handlers:
