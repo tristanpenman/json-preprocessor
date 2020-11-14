@@ -2,12 +2,9 @@
 
 ## Overview
 
-This project provides a JSON Preprocessor library and command line utility that
-can be used to resolve JSON References and other pre-processor directives. It
-was originally motivated by the need to construct CloudFormation templates as
-part of a CI pipeline.
+This project provides a JSON Preprocessor library and command line utility that can be used to resolve JSON References and other preprocessor directives. It was originally motivated by the need to construct CloudFormation templates as part of a CI pipeline.
 
-The following pre-processor directives are supported:
+The following directives are supported:
 
 * ```$exec```
 * ```$join```
@@ -22,14 +19,11 @@ This project has been tested against Python 2.7 and 3.5.
 
 ### $exec
 
-An $exec directive allows the output of an external command to be used as a
-value in a JSON document.
+The `$exec` directive allows the output of an external command to be included as a string value in a JSON document.
 
-The command to be executed is provided as an array. The first element should
-be the path to an executable, with the remaining elements containing program
-arguments.
+The command to be executed is provided as an array. The first element should be the path to an executable, with the remaining elements containing program arguments.
 
-For example, the following JSON snippet:
+For example, take the following JSON snippet:
 
     {
         "timestamp": {
@@ -37,49 +31,43 @@ For example, the following JSON snippet:
         }
     }
 
-would produce output similar to:
+Resolving this directive would produce something like this:
 
     {
         "timestamp": "Thu 25 Sep 2014 15:30:40 AEST"
     }
 
-Note that an $exec directive is *not* executed in a shell, which means that
-functionality such as pipes and shell built-ins are not available.
+It is important to note that an `$exec` directive is *not* executed in a shell, meaning that pipes, redirection and other shell built-ins are not available.
 
 ### $join
 
-The value of $join pre-processor directive must be an array containing
-two elements. The first element is a string that will be placed between
-adjacent elements in the output string. The second element is an array
-of strings, or objects that can be resolved to strings.
+The input for a `$join` directive must be an array containing two elements. The first element is a string that will be placed between adjacent elements in the output string. The second element is an array of strings (or directives that can be resolved to strings).
 
-An example $join pre-preprocessor directive could take the following
-form:
+Here is an example in which a `$join` directive is used to concatenate three string values:
 
     {
         "$join": [ " ", ["A", "B", "C"] ]
     }
 
-When resolved, this example $join directive would produce the
-following output:
+When resolved, this example would produce the following output:
 
     "A B C"
 
-This can be useful when constructing strings using the resolved values of
-other directives. For example:
+This can be useful when constructing strings using the output of other directives. Here is example that joins a static string with the output of an `$exec` directive:
 
     {
         "$join": [ " ", [ "Current time:", { "$exec": [ "/bin/date" ] } ] ]
     }
 
+This would be produce something like this:
+
+    "Current time: Thu 25 Sep 2014 15:30:40 AEST"
+
 ### $merge
 
-The value of a $merge directive must be an array of objects. These
-objects will be combined, with the attributes of later objects taking
-precedence over those provided by earlier objects.
+The input for a `$merge` directive must be an array of objects. These objects will be combined, with the attributes of later objects taking precedence over those provided by earlier objects.
 
-An example $merge pre-preprocessor directive could take the following
-form:
+Here is an example of a `$merge` directive that combines two objects:
 
     {
         "$merge": [
@@ -93,59 +81,47 @@ form:
         ]
     }
 
-When resolved, this example $merge directive would produce the
-following output:
+When resolved, this example `$merge` directive would produce the following output:
 
     {
         "my_attribute": "replacement_value",
         "another_attribute": "another_value"
     }
 
-Note that the value of 'my_attribute' defined by the first object in
-the array has been replaced by the value defined by the second object.
-
+Note that the value of `my_attribute` defined by the first object has been replaced by the value defined by the second object.
 
 ### $ref
 
-A $ref allows JSON References, and other remote resource references, to be
-resolved.
+A `$ref` directive allows JSON References, and other remote resource references, to be resolved.
 
-The JSON Preprocessor library supports the following URIs:
+The JSON Preprocessor library has built-in support for the following resource types:
 
-* ```http://```
-* ```https://```
-* ```file://``` (for absolute file references)
-* ```rel://``` (for relative file references)
+* `http://`
+* `https://`
+* `file://` (for absolute file references)
+* `rel://` (for relative file references)
+
+JSON References can be used to embed the all or part of an external JSON document in the preprocessor output. The library also allows custom resource types to be supported.
 
 ## JSON Preprocessor Utility
 
-This project includes a JSON Preprocessor command line utility that serves as
-an example of how to use the JSON Preprocessor library. It extends the $ref
-directive to retrieve attributes associated with CloudFormation resources,
-which can be useful when constructing CloudFormation templates as part of an
-automated build process.
+This project includes a JSON Preprocessor command line utility that serves as an example of how to use the JSON Preprocessor library. It extends the `$ref` directive to retrieve attributes associated with CloudFormation resources, which can be useful when constructing CloudFormation templates as part of an automated build process.
 
 ### CFN References
 
-This example registers a custom ```$ref``` URI type that adds support for
-CloudFormation resources via the [boto](https://github.com/boto/boto) library.
+This example registers a custom `$ref` URI type that adds support for CloudFormation resources via the [boto](https://github.com/boto/boto) library.
 
 CloudFormation resources are identified using a specific URI format:
 
     cfn://<stack-name>[@region]/<logical-name>[/[attribute]]
 
-```[]``` denotes optional components, whereas ```<>``` denotes mandatory
-components.
+`[]` denotes optional components, whereas `<>` denotes mandatory components.
 
 If any mandatory components are missing, an exception will be raised.
 
-If ```[region]``` is omitted, then the region will be determined using the
-current user's AWS credentials. If ```[region]``` is present, but not
-recognised by boto, an exception may be raised.
+If `[region]` is omitted, then the region will be determined using the current user's AWS credentials. If `[region]` is present, but not recognised by boto, an exception may be raised.
 
-```[attribute]``` may be any attribute that can be returned by the retrieval
-function. If ```[attribute]``` is omitted, the 'PhysicalResourceID' attribute
-will be returned.
+`[attribute]` may be any attribute that can be returned by the retrieval function. If `[attribute]` is omitted, the 'PhysicalResourceID' attribute will be returned.
 
 ### Usage
 
@@ -175,8 +151,7 @@ utility with no arguments:
 
     json-preprocessor
 
-If the installation was successful, usage instructions for `json-preprocessor`
-will be displayed.
+If the installation was successful, usage instructions for `json-preprocessor` will be displayed.
 
 ## License
 
