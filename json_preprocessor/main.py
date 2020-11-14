@@ -2,13 +2,8 @@
 import boto.cloudformation
 import click
 import json
-
-try:
-    from urlparse import urldefrag, urlsplit
-except ImportError:
-    from urllib.parse import urldefrag, urlsplit
-
-from json_preprocessor import resolve
+from urllib.parse import urldefrag, urlsplit
+from .resolution import resolve
 
 
 def retrieve_attribute(stack_name, logical_name, attribute, region):
