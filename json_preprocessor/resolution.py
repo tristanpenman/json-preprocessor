@@ -1,5 +1,6 @@
 import json
 import subprocess
+import itertools
 
 from typing import Union, Callable, Optional, Dict
 from urllib.parse import urldefrag, urlsplit
@@ -27,9 +28,11 @@ def resolve_join(node: Node, base_resolver_fn: Callable) -> str:
     """ Resolve a $join pre-processor directive.
 
         The value of $join pre-processor directive must be an array containing
-        two elements. The first element is a string that will be placed between
-        adjacent elements in the output string. The second element is an array
-        of strings, or objects that can be resolved to strings.
+        two elements. The first element is an array of strings, or objects
+        that can be resolved to strings. The second element is a string that
+        will be placed between adjacent elements in the output string.
+
+        The second argument is optional.
 
         An example $join pre-preprocessor directive could take the following
         form:
@@ -42,18 +45,36 @@ def resolve_join(node: Node, base_resolver_fn: Callable) -> str:
         following output:
 
             "A B C"
+
+        Alternatively, an array delimiter may be provided, in which case
+        this directive will perform an array join.
     """
 
     # Check that the value of the $join directive is an array containing
     # exactly two elements
     if not isinstance(node, list):
         raise Exception("$join value must be an array")
-    elif len(node) != 2:
-        raise Exception("$join array must provide separator and elements")
+    elif len(node) == 0 or len(node) > 2:
+        raise Exception("$join array may only provide elements and a delimiter")
+
+    # Handle array concatenation
+    delimiter = node[1]
+    if delimiter is None:
+      delimiter = ''
+    elif isinstance(delimiter, list):
+      lists = []
+      for element in node[0]:
+        resolved = base_resolver_fn(element, base_resolver_fn)
+        if not isinstance(resolved, list):
+          raise Exception("$join with array delimiter can only join other arrays")
+        lists.append(resolved)
+        lists.append(delimiter)
+      lists.pop()
+      return list(itertools.chain.from_iterable(lists))
 
     # Resolve and join each element
-    return node[0].join([base_resolver_fn(element, base_resolver_fn)
-                         for element in node[1]])
+    return delimiter.join([base_resolver_fn(element, base_resolver_fn)
+                          for element in node[0]])
 
 
 def resolve_merge(node: Node, base_resolver_fn: Callable) -> dict:

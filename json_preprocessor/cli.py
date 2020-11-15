@@ -112,7 +112,7 @@ def resolve_template_with_cfn_support(template_data, params):
        reference pre-existing resources in existing CloudFormation stacks
        using a custom 'cfn://' scheme.
     """
-    return resolve(json.load(template_data), params, {
+    return resolve(template_data, params, {
         'cfn': handle_cfn_uri
     })
 
@@ -136,13 +136,18 @@ parameter_help_text = 'A key-value pair to be passed to the template; ' \
               help=minify_help_text,
               is_flag=True,
               default=False)
-@click.option('--output-file', metavar='<path>',
+@click.option('--output-file',
+              metavar='<path>',
               help=output_file_optional_help_text,
-              type=str, default=None)
-@click.option('--parameter', metavar='<key=value>',
+              type=str,
+              default=None)
+@click.option('--parameter',
+              metavar='<key=value>',
               help=parameter_help_text,
-              type=str, multiple=True)
-@click.argument('path-to-document', metavar='<path-to-document>',
+              type=str,
+              multiple=True)
+@click.argument('path-to-document',
+                metavar='<path-to-document>',
                 type=click.Path(exists=True))
 def run(minify, output_file, parameter, path_to_document):
     """Resolve a CloudFormation template containing JSON pre-processor
