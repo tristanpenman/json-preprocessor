@@ -40,10 +40,11 @@ def parse_cfn_uri(uri):
     # Deconstruct URI
     base_uri, frag = urlparse.urldefrag(uri)
     base_uri_parts = urlparse.urlsplit(base_uri)
+    scheme = base_uri_parts.scheme
 
     # Check URI scheme
-    if base_uri_parts.scheme != "cfn":
-        raise Exception("Scheme '" + base_uri_parts.scheme + "' not supported.")
+    if scheme != "cfn":
+        raise Exception("Scheme '" + scheme + "' not supported.")
 
     # Parse netloc section
     netloc_parts = base_uri_parts.netloc.split("@")
@@ -121,9 +122,9 @@ aws_profile_help_text = 'AWS profile to use when connecting to CloudFormation.'
 
 minify_help_text = 'Compact the JSON output by removing whitespace.'
 
-output_file_optional_help_text = 'Optional path to which JSON output will be ' \
-                                 'written. By default output will be written ' \
-                                 'to STDOUT.'
+output_file_optional_help_text = 'Optional path to which JSON output will ' \
+                                 'be written. By default output will be ' \
+                                 'written to STDOUT.'
 
 parameter_help_text = 'A key-value pair to be passed to the template; ' \
                       'this option may be used more than once to pass in ' \

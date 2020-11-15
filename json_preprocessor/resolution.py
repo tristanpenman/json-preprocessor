@@ -55,7 +55,7 @@ def resolve_join(node: Node, base_resolver_fn: Callable) -> str:
     if not isinstance(node, list):
         raise Exception("$join value must be an array")
     elif len(node) == 0 or len(node) > 2:
-        raise Exception("$join array may only provide elements and a delimiter")
+        raise Exception("$join value contains wrong number of arguments")
 
     # Handle array concatenation
     delimiter = node[1]
@@ -66,7 +66,8 @@ def resolve_join(node: Node, base_resolver_fn: Callable) -> str:
         for element in node[0]:
             resolved = base_resolver_fn(element, base_resolver_fn)
             if not isinstance(resolved, list):
-                raise Exception("$join with array delimiter can only join other arrays")
+                raise Exception(
+                    "$join with array delimiter can only join other arrays")
             lists.append(resolved)
             lists.append(delimiter)
         lists.pop()
@@ -127,7 +128,11 @@ def resolve_merge(node: Node, base_resolver_fn: Callable) -> dict:
     return dict(result)
 
 
-def resolve_ref(node: Node, base_resolver_fn: Callable, uri_handlers: Dict[str, Callable]):
+def resolve_ref(
+        node: Node,
+        base_resolver_fn: Callable,
+        uri_handlers: Dict[str, Callable]):
+
     ref = base_resolver_fn(node, base_resolver_fn)
     base_uri, frag = urldefrag(ref)
     base_uri_parts = urlsplit(base_uri)
@@ -146,14 +151,18 @@ def resolve_ref(node: Node, base_resolver_fn: Callable, uri_handlers: Dict[str, 
                             base_resolver_fn)
 
 
-def resolve_node(node: Union[list, dict], doc_args: dict, custom_uri_handlers: dict) -> Node:
+def resolve_node(
+        node: Union[list, dict],
+        doc_args: dict,
+        custom_uri_handlers: dict) -> Node:
 
     def resolve_uri_arg(uri: str):
         base_uri, frag = urldefrag(uri)
         base_uri_parts = urlsplit(base_uri)
-        if base_uri_parts.netloc not in doc_args:
-            raise Exception("Argument '" + base_uri_parts.netloc + "' not set.")
-        return doc_args[base_uri_parts.netloc]
+        netlooc = base_uri_parts.netloc
+        if netlooc not in doc_args:
+            raise Exception("Argument '" + netlooc + "' not set.")
+        return doc_args[netlooc]
 
     def resolve_uri_rel(uri: str):
         base_uri, frag = urldefrag(uri)
@@ -173,7 +182,10 @@ def resolve_node(node: Union[list, dict], doc_args: dict, custom_uri_handlers: d
         'rel': resolve_uri_rel
     }
 
-    def resolve_ref_with_uri_handlers(inner_node: str, inner_base_resolver_fn: Callable):
+    def resolve_ref_with_uri_handlers(
+            inner_node: str,
+            inner_base_resolver_fn: Callable):
+
         new_dict = default_uri_handlers.copy()
         new_dict.update(custom_uri_handlers)
         return resolve_ref(inner_node, inner_base_resolver_fn, new_dict)
@@ -206,7 +218,10 @@ def resolve_node(node: Union[list, dict], doc_args: dict, custom_uri_handlers: d
     return node
 
 
-def resolve(node: Node, doc_args: dict, custom_uri_handlers: Optional[dict] = None) -> Node:
+def resolve(
+        node: Node,
+        doc_args: dict,
+        custom_uri_handlers: Optional[dict] = None) -> Node:
     """Recursively resolve nodes in a JSON tree
     """
     if not custom_uri_handlers:
