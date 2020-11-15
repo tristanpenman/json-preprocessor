@@ -60,17 +60,17 @@ def resolve_join(node: Node, base_resolver_fn: Callable) -> str:
     # Handle array concatenation
     delimiter = node[1]
     if delimiter is None:
-      delimiter = ''
+        delimiter = ''
     elif isinstance(delimiter, list):
-      lists = []
-      for element in node[0]:
-        resolved = base_resolver_fn(element, base_resolver_fn)
-        if not isinstance(resolved, list):
-          raise Exception("$join with array delimiter can only join other arrays")
-        lists.append(resolved)
-        lists.append(delimiter)
-      lists.pop()
-      return list(itertools.chain.from_iterable(lists))
+        lists = []
+        for element in node[0]:
+            resolved = base_resolver_fn(element, base_resolver_fn)
+            if not isinstance(resolved, list):
+                raise Exception("$join with array delimiter can only join other arrays")
+            lists.append(resolved)
+            lists.append(delimiter)
+        lists.pop()
+        return list(itertools.chain.from_iterable(lists))
 
     # Resolve and join each element
     return delimiter.join([base_resolver_fn(element, base_resolver_fn)
