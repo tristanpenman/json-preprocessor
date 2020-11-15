@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 import boto.cloudformation
 import click
 import json
@@ -145,7 +144,7 @@ parameter_help_text = 'A key-value pair to be passed to the template; ' \
               type=str, multiple=True)
 @click.argument('path-to-document', metavar='<path-to-document>',
                 type=click.Path(exists=True))
-def cli(minify, output_file, parameter, path_to_document):
+def run(minify, output_file, parameter, path_to_document):
     """Resolve a CloudFormation template containing JSON pre-processor
        directives.
     """
@@ -161,7 +160,3 @@ def cli(minify, output_file, parameter, path_to_document):
             with open(output_file, 'w') as f:
                 f.write(resolved)
                 f.close()
-
-
-if __name__ == '__main__':
-    cli()

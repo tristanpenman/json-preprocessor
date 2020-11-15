@@ -1,5 +1,6 @@
 import json
 import unittest
+import os
 
 from json_preprocessor import resolve
 
@@ -12,8 +13,9 @@ test_cases = [
     ('data/030_merge.json', 'data/030_merge_expected.json')
 ]
 
-
 class TestResolution(unittest.TestCase):
+    wd = os.path.dirname(__file__)
+    os.chdir(wd)
     def test(self):
         for test_case in test_cases:
             with open(test_case[0]) as data:
@@ -22,4 +24,4 @@ class TestResolution(unittest.TestCase):
                     self.assertEqual(json.load(expected), actual)
 
 if __name__ == '__main__':
-    unittest.main()
+   unittest.main()

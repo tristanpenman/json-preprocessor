@@ -105,7 +105,7 @@ JSON References can be used to embed the all or part of an external JSON documen
 
 ## JSON Preprocessor Utility
 
-This project includes a JSON Preprocessor command line utility that serves as an example of how to use the JSON Preprocessor library. It extends the `$ref` directive to retrieve attributes associated with CloudFormation resources, which can be useful when constructing CloudFormation templates as part of an automated build process.
+This project includes a JSON Preprocessor command line utility (see [json_preprocessor/cli.py](./json_preprocessor/cli.py)) that serves as an example of how to use the JSON Preprocessor library. It extends the `$ref` directive to retrieve attributes associated with CloudFormation resources, which can be useful when constructing CloudFormation templates as part of an automated build process.
 
 ### CFN References
 
@@ -152,6 +152,17 @@ utility with no arguments:
     json-preprocessor
 
 If the installation was successful, usage instructions for `json-preprocessor` will be displayed.
+
+## Development
+
+The json_preprocessor module also includes a `__main__.py` file, so an alternative is to run the example locally:
+
+    pip install -r requirements
+    python -m json_preprocessor
+
+And to run the tests:
+
+    python -m unittest
 
 ## License
 

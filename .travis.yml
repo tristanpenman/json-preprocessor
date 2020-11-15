@@ -7,6 +7,4 @@ install:
   - "pip install -r requirements.txt"
   - "python setup.py -q install"
 script:
-  - "cd json_preprocessor/test"
-  - "python test_json_preprocessor.py"
-
+  - "python -m unittest"
