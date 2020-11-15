@@ -41,12 +41,12 @@ It is important to note that an `$exec` directive is *not* executed in a shell, 
 
 ### $join
 
-The input for a `$join` directive must be an array containing two elements. The first element is a string that will be placed between adjacent elements in the output string. The second element is an array of strings (or directives that can be resolved to strings).
+The input for a `$join` directive must be an array containing two elements. The first element is an array of strings (or directives that can be resolved to strings). The second element is a string that will be placed between adjacent elements in the output string.
 
 Here is an example in which a `$join` directive is used to concatenate three string values:
 
     {
-        "$join": [ " ", ["A", "B", "C"] ]
+        "$join": [ ["A", "B", "C"], " " ]
     }
 
 When resolved, this example would produce the following output:
@@ -56,12 +56,29 @@ When resolved, this example would produce the following output:
 This can be useful when constructing strings using the output of other directives. Here is example that joins a static string with the output of an `$exec` directive:
 
     {
-        "$join": [ " ", [ "Current time:", { "$exec": [ "/bin/date" ] } ] ]
+        "$join": [ [ "Current time:", { "$exec": [ "/bin/date" ] } ], " " ]
     }
 
 This would be produce something like this:
 
     "Current time: Thu 25 Sep 2014 15:30:40 AEST"
+
+Alternatively, an array delimiter can be used, which will change `$join` to perform array concatenation:
+
+    {
+        "$join": [
+            [
+                { "$ref": "file://abc.json" },
+                [ "1", "2", "3" ],
+                { "$ref": "file://xyz.json" }
+            ],
+            [ "*", "*" ]
+        ]
+    }
+
+Assuming `abc.json` and `xyz.json` contain the arrays `["a", "b", "c"]` and `["x", "y", "z"]` respectively, the output would look like this:
+
+    [ "a", "b", "c", "*", "*", "1", "2", "3", "*", "*", "x", "y", "z" ]
 
 ### $merge
 
