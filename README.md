@@ -1,6 +1,4 @@
-# JSON Preprocessor [![Build Status](https://travis-ci.org/tristanpenman/json-preprocessor.svg)](https://travis-ci.org/tristanpenman/json-preprocessor)
-
-## Overview
+# JSON Preprocessor
 
 This project provides a JSON Preprocessor library and command line utility that can be used to resolve JSON References and other preprocessor directives. It was originally motivated by the need to construct CloudFormation templates as part of a CI pipeline.
 
@@ -189,4 +187,4 @@ See the LICENSE file for more information.
 
 ## Acknowledgements
 
-Shout-out to [elruwen](https://github.com/elruwen) for early code reviews.
+Thanks to [elruwen](https://github.com/elruwen) for early code reviews, and [cvlvxi](https://github.com/cvlvxi) for help modernising the code.
